@@ -1,36 +1,65 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Float, Environment } from "@react-three/drei";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import heroBg from "@/assets/hero-bg.jpg";
 
-// Lazy load the 3D component for performance
+gsap.registerPlugin(ScrollTrigger);
+
 const YarnBall = lazy(() => import("./YarnBall"));
 
-/**
- * Fullscreen immersive hero section with a 3D yarn ball,
- * animated tagline, and scroll indicator.
- */
 const Hero = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
+
   const scrollToAbout = () => {
     document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Parallax zoom on hero background
+  useEffect(() => {
+    if (!bgRef.current || !sectionRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        bgRef.current,
+        { scale: 1 },
+        {
+          scale: 1.15,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        }
+      );
+    });
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
-      {/* Background image with overlay */}
+    <section ref={sectionRef} className="relative flex min-h-screen items-center justify-center overflow-hidden">
+      {/* Parallax background */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        ref={bgRef}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat will-change-transform"
         style={{ backgroundImage: `url(${heroBg})` }}
       >
-        <div className="absolute inset-0 bg-background/40 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-background/50 backdrop-blur-[2px]" />
       </div>
+
+      {/* Floating decorative elements */}
+      <div className="float-on-scroll absolute left-[10%] top-[20%] h-16 w-16 rounded-full bg-primary/10 blur-xl" />
+      <div className="float-on-scroll absolute right-[15%] top-[60%] h-24 w-24 rounded-full bg-accent/10 blur-xl" />
+      <div className="float-on-scroll absolute left-[60%] top-[15%] h-12 w-12 rounded-full bg-rose/15 blur-lg" />
 
       {/* Content */}
       <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center gap-8 px-6 lg:flex-row lg:gap-16 lg:px-12">
-        {/* Text Content */}
         <div className="flex-1 text-center lg:text-left">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -70,13 +99,13 @@ const Hero = () => {
           >
             <Link
               to="/products"
-              className="group rounded-full bg-primary px-8 py-4 font-body text-sm font-semibold uppercase tracking-wider text-primary-foreground shadow-glow transition-all duration-300 hover:shadow-card-hover hover:scale-105"
+              className="group rounded-full bg-primary px-8 py-4 font-body text-sm font-semibold uppercase tracking-wider text-primary-foreground shadow-glow transition-all duration-300 hover:shadow-card-hover hover:scale-105 hover:-translate-y-1"
             >
               Explore Creations
             </Link>
             <button
               onClick={scrollToAbout}
-              className="rounded-full border border-border bg-card/50 px-8 py-4 font-body text-sm font-semibold uppercase tracking-wider text-foreground backdrop-blur-sm transition-all duration-300 hover:bg-card hover:shadow-soft"
+              className="rounded-full border border-border bg-card/50 px-8 py-4 font-body text-sm font-semibold uppercase tracking-wider text-foreground backdrop-blur-sm transition-all duration-300 hover:bg-card hover:shadow-soft hover:-translate-y-1"
             >
               Our Story
             </button>
@@ -97,7 +126,7 @@ const Hero = () => {
           >
             <ambientLight intensity={0.6} />
             <directionalLight position={[5, 5, 5]} intensity={0.8} color="#fce4ec" />
-            <pointLight position={[-5, -5, 5]} intensity={0.4} color="#c8e6c9" />
+            <pointLight position={[-5, -5, 5]} intensity={0.4} color="#f8bbd0" />
             <Suspense fallback={null}>
               <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.5}>
                 <YarnBall />

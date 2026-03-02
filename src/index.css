@@ -6,81 +6,81 @@
 
 @layer base {
   :root {
-    /* Warm cream canvas */
-    --background: 38 35% 96%;
-    --foreground: 25 35% 12%;
+    /* Soft pink canvas */
+    --background: 340 40% 96%;
+    --foreground: 335 25% 18%;
 
-    /* Cards: slightly warmer than background */
-    --card: 36 30% 98%;
-    --card-foreground: 25 35% 12%;
+    /* Cards: warm pink-white */
+    --card: 340 45% 97%;
+    --card-foreground: 335 25% 18%;
 
-    --popover: 36 30% 98%;
-    --popover-foreground: 25 35% 12%;
+    --popover: 340 45% 97%;
+    --popover-foreground: 335 25% 18%;
 
-    /* Primary: Soft rose / dusty pink */
-    --primary: 350 45% 62%;
+    /* Primary: Soft rose pink */
+    --primary: 340 60% 65%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Sage green */
-    --secondary: 148 22% 82%;
-    --secondary-foreground: 150 30% 18%;
+    /* Secondary: Light blush */
+    --secondary: 340 35% 90%;
+    --secondary-foreground: 335 30% 25%;
 
-    /* Muted: Light warm beige */
-    --muted: 35 25% 91%;
-    --muted-foreground: 25 15% 48%;
+    /* Muted: Pale pink beige */
+    --muted: 338 30% 92%;
+    --muted-foreground: 335 15% 42%;
 
-    /* Accent: Yarn brown / terracotta */
-    --accent: 25 45% 68%;
-    --accent-foreground: 25 50% 15%;
+    /* Accent: Deeper rose */
+    --accent: 340 55% 72%;
+    --accent-foreground: 335 40% 18%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 30 20% 88%;
-    --input: 30 20% 88%;
-    --ring: 350 45% 62%;
+    --border: 340 25% 90%;
+    --input: 340 25% 90%;
+    --ring: 340 60% 65%;
 
     --radius: 1rem;
 
-    /* Custom brand tokens */
-    --cream: 38 35% 96%;
-    --rose: 350 45% 62%;
-    --rose-light: 350 50% 90%;
-    --sage: 148 22% 72%;
-    --sage-light: 148 22% 92%;
-    --yarn-brown: 25 45% 55%;
-    --yarn-brown-light: 25 40% 85%;
-    --warm-white: 40 30% 99%;
-    --deep-brown: 25 40% 18%;
+    /* Custom brand tokens — soft pink palette */
+    --cream: 340 40% 96%;
+    --rose: 340 60% 65%;
+    --rose-light: 340 55% 92%;
+    --sage: 340 20% 78%;
+    --sage-light: 340 25% 94%;
+    --yarn-brown: 340 30% 58%;
+    --yarn-brown-light: 340 25% 88%;
+    --warm-white: 340 30% 99%;
+    --deep-brown: 335 25% 18%;
 
     /* Gradients */
     --gradient-hero: linear-gradient(
       135deg,
-      hsl(38 35% 96%) 0%,
-      hsl(350 50% 95%) 50%,
-      hsl(148 22% 92%) 100%
+      hsl(340 40% 96%) 0%,
+      hsl(340 55% 94%) 50%,
+      hsl(340 60% 92%) 100%
     );
     --gradient-warm: linear-gradient(
       180deg,
-      hsl(38 35% 96%) 0%,
-      hsl(36 30% 98%) 100%
+      hsl(340 40% 96%) 0%,
+      hsl(340 45% 97%) 100%
     );
     --gradient-rose: linear-gradient(
       135deg,
-      hsl(350 45% 62%) 0%,
-      hsl(350 55% 72%) 100%
+      hsl(340 60% 65%) 0%,
+      hsl(340 70% 75%) 100%
     );
     --gradient-sage: linear-gradient(
       135deg,
-      hsl(148 22% 72%) 0%,
-      hsl(148 30% 82%) 100%
+      hsl(340 20% 78%) 0%,
+      hsl(340 30% 85%) 100%
     );
 
-    /* Shadows */
-    --shadow-soft: 0 4px 20px -4px hsl(25 30% 50% / 0.1);
-    --shadow-card: 0 8px 30px -8px hsl(25 30% 50% / 0.12);
-    --shadow-card-hover: 0 16px 40px -8px hsl(350 45% 62% / 0.15);
-    --shadow-glow: 0 0 40px hsl(350 45% 62% / 0.1);
+    /* Shadows — soft diffused pink */
+    --shadow-soft: 0 4px 24px -4px hsl(340 40% 60% / 0.08);
+    --shadow-card: 0 8px 32px -8px hsl(340 40% 60% / 0.12);
+    --shadow-card-hover: 0 20px 50px -10px hsl(340 60% 65% / 0.18);
+    --shadow-glow: 0 0 50px hsl(340 60% 65% / 0.12);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -107,14 +107,26 @@
     font-family: 'Playfair Display', serif;
   }
 
-  /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
+  /* Lenis smooth scroll */
+  html.lenis, html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
   }
 
   /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
 
   ::-webkit-scrollbar-track {
@@ -122,12 +134,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: hsl(var(--muted-foreground) / 0.3);
+    background: hsl(var(--rose) / 0.3);
     border-radius: 10px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--muted-foreground) / 0.5);
+    background: hsl(var(--rose) / 0.5);
   }
 }
 
@@ -144,9 +156,9 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      hsl(var(--rose) / 0.3) 20%,
-      hsl(var(--sage) / 0.4) 50%,
-      hsl(var(--yarn-brown) / 0.3) 80%,
+      hsl(var(--rose) / 0.4) 20%,
+      hsl(var(--accent) / 0.5) 50%,
+      hsl(var(--rose) / 0.4) 80%,
       transparent 100%
     );
     height: 2px;
@@ -164,9 +176,27 @@
   }
 
   .glass-card {
-    background: hsl(var(--warm-white) / 0.7);
+    background: hsl(var(--warm-white) / 0.8);
     backdrop-filter: blur(20px);
     border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  /* GSAP heading reveal helper */
+  .gsap-heading .char {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  /* Parallax layers */
+  .parallax-bg {
+    will-change: transform;
+  }
+
+  /* 3D tilt card */
+  .tilt-card {
+    transform-style: preserve-3d;
+    perspective: 1000px;
   }
 }
 

@@ -9,12 +9,11 @@ import Products from "./pages/Products";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import { useSmoothScroll } from "./hooks/useSmoothScroll";
+import { useGsapAnimations } from "./hooks/useGsapAnimations";
 
 const queryClient = new QueryClient();
 
-/**
- * Scroll to top on route change for smooth page transitions
- */
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -23,20 +22,31 @@ const ScrollToTop = () => {
   return null;
 };
 
+const AppShell = () => {
+  useSmoothScroll();
+  useGsapAnimations();
+
+  return (
+    <>
+      <Navbar />
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      <Footer />
+    </>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Navbar />
-        <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Footer />
+        <AppShell />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

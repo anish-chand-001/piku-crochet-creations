@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { formatPrice, Product } from "@/data/products";
+import { useCardTilt } from "@/hooks/useCardTilt";
 
 interface ProductCardProps {
   product: Product;
@@ -8,10 +9,11 @@ interface ProductCardProps {
 }
 
 /**
- * A single product card with hover animations:
- * lift effect, soft glow, and scale transition.
+ * Product card with 3D tilt on hover, parallax motion, and soft glow.
  */
 const ProductCard = ({ product, image, index = 0 }: ProductCardProps) => {
+  const { ref, onMouseMove, onMouseLeave } = useCardTilt(6);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -20,7 +22,13 @@ const ProductCard = ({ product, image, index = 0 }: ProductCardProps) => {
       transition={{ delay: index * 0.1, duration: 0.6, ease: [0.25, 0.4, 0.25, 1] }}
       className="group cursor-pointer"
     >
-      <div className="relative overflow-hidden rounded-2xl bg-card shadow-soft transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-card-hover">
+      <div
+        ref={ref}
+        onMouseMove={onMouseMove}
+        onMouseLeave={onMouseLeave}
+        className="relative overflow-hidden rounded-2xl bg-card shadow-soft transition-all duration-500 group-hover:shadow-card-hover"
+        style={{ transition: "transform 0.15s ease-out, box-shadow 0.5s ease" }}
+      >
         {/* Image */}
         <div className="relative aspect-square overflow-hidden">
           <img
@@ -29,10 +37,8 @@ const ProductCard = ({ product, image, index = 0 }: ProductCardProps) => {
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
             loading="lazy"
           />
-          {/* Soft glow overlay on hover */}
           <div className="absolute inset-0 bg-gradient-to-t from-foreground/10 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-          {/* Category badge */}
           <span className="absolute left-4 top-4 rounded-full bg-card/80 px-3 py-1 font-body text-xs font-medium text-foreground backdrop-blur-sm">
             {product.category}
           </span>
