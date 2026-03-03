@@ -51,7 +51,7 @@ const Hero = () => {
           style={{ backgroundColor: "hsl(var(--background))" }}
           src={heroVideo}
         />
-        <div className="absolute inset-0 bg-background/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/15 via-background/20 to-background/35" />
       </div>
 
       {/* Floating decorative elements */}
@@ -61,7 +61,7 @@ const Hero = () => {
 
       {/* Content */}
       <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 sm:px-6 lg:flex-row lg:gap-16 lg:px-12">
-        <div className="flex-1 rounded-3xl bg-background/50 px-6 py-8 text-center backdrop-blur-md sm:px-10 sm:py-10 lg:text-left">
+        <div className="flex-1 text-center lg:text-left">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
