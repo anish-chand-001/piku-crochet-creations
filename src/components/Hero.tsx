@@ -1,16 +1,12 @@
-import { Suspense, lazy, useEffect, useRef } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Float, Environment } from "@react-three/drei";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import heroBg from "@/assets/hero-bg.jpg";
+import heroVideo from "@/assets/hero-video.mp4";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const YarnBall = lazy(() => import("./YarnBall"));
 
 const Hero = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -44,13 +40,17 @@ const Hero = () => {
 
   return (
     <section ref={sectionRef} className="relative flex min-h-screen items-center justify-center overflow-hidden">
-      {/* Parallax background */}
-      <div
-        ref={bgRef}
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat will-change-transform"
-        style={{ backgroundImage: `url(${heroBg})` }}
-      >
-        <div className="absolute inset-0 bg-background/50 backdrop-blur-[2px]" />
+      {/* Video background */}
+      <div ref={bgRef} className="absolute inset-0 will-change-transform">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="h-full w-full object-cover"
+          src={heroVideo}
+        />
+        <div className="absolute inset-0 bg-background/40 backdrop-blur-[1px]" />
       </div>
 
       {/* Floating decorative elements */}
@@ -111,38 +111,6 @@ const Hero = () => {
             </button>
           </motion.div>
         </div>
-
-        {/* 3D Yarn Ball */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6, duration: 1.2, ease: "easeOut" }}
-          className="h-[350px] w-[350px] md:h-[450px] md:w-[450px] lg:h-[500px] lg:w-[500px]"
-        >
-          <Canvas
-            camera={{ position: [0, 0, 5], fov: 45 }}
-            dpr={[1, 2]}
-            style={{ background: "transparent" }}
-          >
-            <ambientLight intensity={0.6} />
-            <directionalLight position={[5, 5, 5]} intensity={0.8} color="#fce4ec" />
-            <pointLight position={[-5, -5, 5]} intensity={0.4} color="#f8bbd0" />
-            <Suspense fallback={null}>
-              <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.5}>
-                <YarnBall />
-              </Float>
-              <Environment preset="studio" />
-            </Suspense>
-            <OrbitControls
-              enableZoom={false}
-              enablePan={false}
-              autoRotate
-              autoRotateSpeed={0.5}
-              maxPolarAngle={Math.PI / 1.5}
-              minPolarAngle={Math.PI / 3}
-            />
-          </Canvas>
-        </motion.div>
       </div>
 
       {/* Scroll Indicator */}
