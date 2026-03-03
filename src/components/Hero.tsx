@@ -47,8 +47,8 @@ const Hero = () => {
           muted
           loop
           playsInline
-          className="h-full w-full object-cover object-center md:object-center"
-          style={{ objectPosition: "center 70%" }}
+          className="h-full w-full object-contain sm:object-cover"
+          style={{ backgroundColor: "hsl(var(--background))" }}
           src={heroVideo}
         />
         <div className="absolute inset-0 bg-background/40 backdrop-blur-[1px]" />
