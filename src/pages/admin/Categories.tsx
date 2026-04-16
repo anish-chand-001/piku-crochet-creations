@@ -36,7 +36,10 @@ const Categories = () => {
             try {
                 const res = await fetch(`${API_URL}/categories`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
                     body: JSON.stringify({ name }),
                     credentials: 'include'
                 });
@@ -65,6 +68,9 @@ const Categories = () => {
             try {
                 const res = await fetch(`${API_URL}/categories/${id}`, {
                     method: 'DELETE',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
                     credentials: 'include'
                 });
                 if (!res.ok) {

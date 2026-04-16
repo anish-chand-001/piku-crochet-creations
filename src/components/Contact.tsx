@@ -4,14 +4,6 @@ import { motion } from "framer-motion";
 
 const contactMethods = [
   
-  // {
-  //   icon: Phone,
-  //   label: "Phone",
-  //   value: "+91 98765 43210",
-  //   href: "tel:+919876543210",
-  //   description: "Call us anytime",
-  //   colorClass: "bg-yarn-brown-light text-accent-foreground",
-  // },
   {
     icon: Instagram,
     label: "Instagram",
