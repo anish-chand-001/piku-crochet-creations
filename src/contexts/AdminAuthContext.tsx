@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '@/config/api';
+import { ADMIN_DASHBOARD_PATH, ADMIN_LOGIN_PATH } from '@/config/admin';
 
 interface AdminContextType {
     isAuthenticated: boolean;
@@ -39,14 +40,20 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
 
     const login = () => {
         setIsAuthenticated(true);
-        navigate('/admin/dashboard');
+        navigate(ADMIN_DASHBOARD_PATH);
     };
 
     const logout = async () => {
         try {
-            await fetch(`${API_URL}/admin/logout`, { method: 'POST', credentials: 'include' });
+            await fetch(`${API_URL}/admin/logout`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
             setIsAuthenticated(false);
-            navigate('/admin/login');
+            navigate(ADMIN_LOGIN_PATH);
         } catch (error) {
             console.error('Logout error', error);
         }

@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const statsController = require('../controllers/statsController');
-const authMiddleware = require('../middleware/authMiddleware');
+const requireAdmin = require('../middleware/requireAdmin');
+const { adminLimiter } = require('../middleware/rateLimiter');
 
 // Get overall site statistics for the admin dashboard
-router.get('/', authMiddleware, statsController.getStats);
+router.get('/', requireAdmin, adminLimiter, statsController.getStats);
 
 module.exports = router;

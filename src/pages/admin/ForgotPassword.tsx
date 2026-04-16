@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, CheckCircle2 } from 'lucide-react';
 import { API_URL } from '@/config/api';
+import { ADMIN_LOGIN_PATH } from '@/config/admin';
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
@@ -20,7 +21,10 @@ const ForgotPassword = () => {
         try {
             const response = await fetch(`${API_URL}/admin/forgot-password`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
                 body: JSON.stringify({ email }),
             });
 
@@ -61,7 +65,7 @@ const ForgotPassword = () => {
                                 A reset link has been sent to {email}.
                             </p>
                             <div className="mt-6">
-                                <Link to="/admin/login" className="text-sm font-medium text-[#c2185b] hover:text-[#9c1349]">
+                                <Link to={ADMIN_LOGIN_PATH} className="text-sm font-medium text-[#c2185b] hover:text-[#9c1349]">
                                     &larr; Back to Login
                                 </Link>
                             </div>
@@ -97,7 +101,7 @@ const ForgotPassword = () => {
 
                             <div className="flex items-center justify-center mt-4">
                                 <div className="text-sm">
-                                    <Link to="/admin/login" className="font-medium text-[#c2185b] hover:text-[#9c1349]">
+                                    <Link to={ADMIN_LOGIN_PATH} className="font-medium text-[#c2185b] hover:text-[#9c1349]">
                                         &larr; Back to Login
                                     </Link>
                                 </div>

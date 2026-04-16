@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, CheckCircle2 } from 'lucide-react';
 import { API_URL } from '@/config/api';
+import { ADMIN_BASE_PATH, ADMIN_LOGIN_PATH } from '@/config/admin';
 
 const ResetPassword = () => {
     const { token } = useParams<{ token: string }>();
@@ -35,7 +36,10 @@ const ResetPassword = () => {
         try {
             const response = await fetch(`${API_URL}/admin/reset-password/${token}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
                 body: JSON.stringify({ newPassword }),
             });
 
@@ -44,7 +48,7 @@ const ResetPassword = () => {
             if (response.ok) {
                 setIsSuccess(true);
                 setTimeout(() => {
-                    navigate('/admin/login');
+                    navigate(ADMIN_LOGIN_PATH);
                 }, 2000);
             } else {
                 setErrorMsg(data.message || 'Reset link is invalid or has expired.');
@@ -83,7 +87,7 @@ const ResetPassword = () => {
                                     {errorMsg}
                                     {errorMsg.toLowerCase().includes('invalid') && (
                                         <div className="mt-2 text-center">
-                                            <Link to="/admin/forgot-password" className="font-medium text-[#c2185b] hover:text-[#9c1349] underline">
+                                            <Link to={`${ADMIN_BASE_PATH}/forgot-password`} className="font-medium text-[#c2185b] hover:text-[#9c1349] underline">
                                                 Request a new link
                                             </Link>
                                         </div>
