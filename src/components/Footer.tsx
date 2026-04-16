@@ -67,7 +67,7 @@ const Footer = () => {
                 </a>
               </div>
               <p className="mt-4 font-body text-sm text-muted-foreground">
-                mehtapalak.crocheter@gmail.com
+                anishchand9984@gmail.com
               </p>
             </div>
           </div>

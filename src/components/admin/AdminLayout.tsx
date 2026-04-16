@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
-import { LayoutDashboard, Package, Tags, LogOut, Loader2, Settings as SettingsIcon, Menu, X, ShoppingCart, Users } from 'lucide-react';
+import { LayoutDashboard, Package, Tags, LogOut, Loader2, Settings as SettingsIcon, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { ADMIN_BASE_PATH, ADMIN_LOGIN_PATH } from '@/config/admin';
 
 export const AdminLayout = () => {
     const { isAuthenticated, isLoading, logout } = useAdminAuth();
@@ -20,16 +19,14 @@ export const AdminLayout = () => {
     }
 
     if (!isAuthenticated) {
-        return <Navigate to={ADMIN_LOGIN_PATH} replace />;
+        return <Navigate to="/admin/login" replace />;
     }
 
     const links = [
-        { name: 'Dashboard', path: `${ADMIN_BASE_PATH}/dashboard`, icon: LayoutDashboard },
-        { name: 'Products', path: `${ADMIN_BASE_PATH}/products`, icon: Package },
-        { name: 'Categories', path: `${ADMIN_BASE_PATH}/categories`, icon: Tags },
-        { name: 'Orders', path: `${ADMIN_BASE_PATH}/orders`, icon: ShoppingCart },
-        { name: 'Users', path: `${ADMIN_BASE_PATH}/users`, icon: Users },
-        { name: 'Settings', path: `${ADMIN_BASE_PATH}/settings`, icon: SettingsIcon },
+        { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+        { name: 'Products', path: '/admin/products', icon: Package },
+        { name: 'Categories', path: '/admin/categories', icon: Tags },
+        { name: 'Settings', path: '/admin/settings', icon: SettingsIcon },
     ];
 
     const SidebarContent = ({ onLinkClick }: { onLinkClick?: () => void }) => (

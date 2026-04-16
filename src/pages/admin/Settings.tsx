@@ -14,12 +14,12 @@ const AdminSettings = () => {
 
     const handleRegisterAdmin = async (e: React.FormEvent) => {
         e.preventDefault();
-
+        
         if (password !== confirmPassword) {
             toast.error("Passwords do not match");
             return;
         }
-
+        
         if (password.length < 8) {
             toast.error("Password must be at least 8 characters");
             return;
@@ -29,9 +29,8 @@ const AdminSettings = () => {
         try {
             const response = await fetch(`${API_URL}/admin/register`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
+                headers: { 
+                    'Content-Type': 'application/json'
                 },
                 credentials: 'include',
                 body: JSON.stringify({ email, password }),
@@ -65,7 +64,7 @@ const AdminSettings = () => {
 
             <div className="bg-white shadow rounded-lg p-6 max-w-2xl">
                 <h3 className="text-lg font-medium border-b pb-4 mb-4">Add New Admin</h3>
-
+                
                 <form onSubmit={handleRegisterAdmin} className="space-y-4">
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email Address</Label>
@@ -78,7 +77,7 @@ const AdminSettings = () => {
                             onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
-
+                    
                     <div className="grid gap-2">
                         <Label htmlFor="password">Password (Minimum 8 characters)</Label>
                         <Input

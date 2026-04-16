@@ -12,7 +12,6 @@ interface Product {
   description: string;
   category: string;
   imageUrl: string;
-  images?: string[];
 }
 
 /**
@@ -66,7 +65,7 @@ const FeaturedProducts = () => {
               <ProductCard
                 key={product._id}
                 product={product}
-                image={product.images?.[0] || product.imageUrl}
+                image={product.imageUrl}
                 index={i}
               />
             ))}

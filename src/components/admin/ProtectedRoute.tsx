@@ -1,7 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import { Loader2 } from 'lucide-react';
-import { ADMIN_LOGIN_PATH } from '@/config/admin';
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { isAuthenticated, isLoading } = useAdminAuth();
@@ -16,7 +15,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     }
 
     if (!isAuthenticated) {
-        return <Navigate to={`${ADMIN_LOGIN_PATH}?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+        return <Navigate to={`/admin/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
     }
 
     return <>{children}</>;

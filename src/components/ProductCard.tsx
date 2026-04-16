@@ -1,9 +1,5 @@
 import { motion } from "framer-motion";
 import { useCardTilt } from "@/hooks/useCardTilt";
-import { ShoppingCart, Loader2 } from "lucide-react";
-import { useState } from "react";
-import { useCart } from "@/hooks/useCart";
-import { useUserAuth } from "@/contexts/UserAuthContext";
 
 export interface Product {
   _id?: string;
@@ -11,8 +7,6 @@ export interface Product {
   price: number;
   description: string;
   category: string;
-  imageUrl?: string;
-  images?: string[];
 }
 
 export const formatPrice = (price: number) => {
@@ -35,26 +29,6 @@ interface ProductCardProps {
  */
 const ProductCard = ({ product, image, index = 0 }: ProductCardProps) => {
   const { ref, onMouseMove, onMouseLeave } = useCardTilt(6);
-  const { addToCart, isAdding } = useCart();
-  const { isAuthenticated } = useUserAuth();
-  const [showCartFeedback, setShowCartFeedback] = useState(false);
-
-  const handleQuickAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent opening the modal
-
-    if (!isAuthenticated) {
-      window.location.href = '/login';
-      return;
-    }
-
-    // Show feedback immediately
-    setShowCartFeedback(true);
-    setTimeout(() => setShowCartFeedback(false), 2000);
-
-    addToCart(
-      { productId: product._id || '', quantity: 1 }
-    );
-  };
 
   return (
     <motion.div
@@ -84,33 +58,6 @@ const ProductCard = ({ product, image, index = 0 }: ProductCardProps) => {
           <span className="absolute left-4 top-4 rounded-full bg-card/80 px-3 py-1 font-body text-xs font-medium text-foreground backdrop-blur-sm shadow-sm">
             {product.category}
           </span>
-
-          {/* Quick add button on hover */}
-          <motion.button
-            onClick={handleQuickAddToCart}
-            disabled={isAdding}
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileHover={{ opacity: 1, scale: 1 }}
-            className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-primary shadow-lg text-white flex items-center justify-center hover:scale-110 transition-transform disabled:opacity-60"
-          >
-            {isAdding ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <ShoppingCart className="w-5 h-5" />
-            )}
-          </motion.button>
-
-          {/* Add to cart success feedback */}
-          {showCartFeedback && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="absolute inset-0 bg-green-600/90 flex items-center justify-center text-white font-bold"
-            >
-              ✓ Added to cart
-            </motion.div>
-          )}
         </div>
 
         {/* Info */}
@@ -126,7 +73,7 @@ const ProductCard = ({ product, image, index = 0 }: ProductCardProps) => {
           </p>
         </div>
       </div>
-    </motion.div >
+    </motion.div>
   );
 };
 

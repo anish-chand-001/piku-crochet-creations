@@ -13,7 +13,6 @@ interface Product {
   description: string;
   category: string;
   imageUrl: string;
-  images?: string[];
 }
 
 const Products = () => {
@@ -43,9 +42,6 @@ const Products = () => {
     mutationFn: async (id: string) => {
       const res = await fetch(`${API_URL}/products/${id}`, {
         method: 'DELETE',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest'
-        },
         credentials: 'include'
       });
       if (!res.ok) throw new Error('Failed to delete product');
@@ -116,11 +112,7 @@ const Products = () => {
                   <tr key={product._id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex-shrink-0 w-12 h-12 rounded overflow-hidden shadow-sm border border-gray-100">
-                        <img
-                          className="w-full h-full object-cover"
-                          src={product.images?.[0] || product.imageUrl}
-                          alt={product.name}
-                        />
+                        <img className="w-full h-full object-cover" src={product.imageUrl} alt={product.name} />
                       </div>
                     </td>
                     <td className="px-6 py-4">

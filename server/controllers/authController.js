@@ -3,20 +3,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const sendResetEmail = require('../utils/sendEmail');
-const { sanitizeString, validateEmail } = require('../utils/validators');
-const { logAdminAction } = require('../utils/adminLogger');
 
 exports.login = async (req, res) => {
     try {
-        const email = sanitizeString(req.body.email).toLowerCase();
-        const password = req.body.password;
+        const { email, password } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({ message: 'Email and password are required' });
-        }
-
-        if (!validateEmail(email)) {
-            return res.status(400).json({ message: 'Please enter a valid email address' });
         }
 
         const admin = await Admin.findOne({ email });
@@ -47,9 +40,9 @@ exports.login = async (req, res) => {
         admin.last_login = Date.now();
         await admin.save();
 
-        const payload = { adminId: admin._id, email: admin.email, role: 'admin' };
+        const payload = { adminId: admin._id, role: 'admin' };
         const token = jwt.sign(payload, process.env.JWT_SECRET || 'fallback_secret', {
-            expiresIn: '1d'
+            expiresIn: '5d'
         });
 
         // Set HTTP Only Cookie
@@ -57,10 +50,9 @@ exports.login = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-            maxAge: 24 * 60 * 60 * 1000 // 1 day
+            maxAge: 5 * 24 * 60 * 60 * 1000 // 5 days
         });
 
-        logAdminAction({ user: payload }, 'logged in');
         res.json({ message: 'Logged in successfully', admin: { email: admin.email, role: 'admin' } });
 
     } catch (error) {
@@ -85,15 +77,10 @@ exports.checkAuth = (req, res) => {
 
 exports.register = async (req, res) => {
     try {
-        const email = sanitizeString(req.body.email).toLowerCase();
-        const password = req.body.password;
+        const { email, password } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({ message: 'Email and password are required' });
-        }
-
-        if (!validateEmail(email)) {
-            return res.status(400).json({ message: 'Please enter a valid email address' });
         }
 
         if (password.length < 8) {
@@ -114,7 +101,6 @@ exports.register = async (req, res) => {
 
         await newAdmin.save();
 
-        logAdminAction(req, 'registered admin', email);
         res.status(201).json({ message: 'New admin registered successfully', email: newAdmin.email });
     } catch (error) {
         console.error('Registration error:', error);
@@ -124,10 +110,7 @@ exports.register = async (req, res) => {
 
 exports.forgotPassword = async (req, res) => {
     try {
-        const email = sanitizeString(req.body.email).toLowerCase();
-        if (!validateEmail(email)) {
-            return res.status(400).json({ message: 'Please enter a valid email address' });
-        }
+        const { email } = req.body;
         const admin = await Admin.findOne({ email });
         if (!admin) {
             return res.status(404).json({ message: 'No account found with that email.' });
@@ -141,7 +124,7 @@ exports.forgotPassword = async (req, res) => {
         const protocol = req.headers['x-forwarded-proto'] || req.protocol;
         const host = req.headers.host;
         const clientUrl = process.env.CLIENT_URL || `${protocol}://${host}`;
-        const resetUrl = `${clientUrl}/secure-admin-dashboard/reset-password/${token}`;
+        const resetUrl = `${clientUrl}/admin/reset-password/${token}`;
         
         await sendResetEmail(admin.email, resetUrl);
 

@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { API_URL } from '@/config/api';
-import { ADMIN_BASE_PATH, ADMIN_DASHBOARD_PATH } from '@/config/admin';
 
 const AdminLogin = () => {
     const { isAuthenticated, login } = useAdminAuth();
@@ -19,7 +18,7 @@ const AdminLogin = () => {
 
     // Get redirect path from query params, default to dashboard
     const searchParams = new URLSearchParams(location.search);
-    const redirectTo = searchParams.get('redirect') || ADMIN_DASHBOARD_PATH;
+    const redirectTo = searchParams.get('redirect') || '/admin/dashboard';
 
     if (isAuthenticated) {
         return <Navigate to={redirectTo} replace />;
@@ -32,10 +31,7 @@ const AdminLogin = () => {
         try {
             const response = await fetch(`${API_URL}/admin/login`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
                 credentials: 'include'
             });
@@ -101,7 +97,7 @@ const AdminLogin = () => {
 
                         <div className="flex items-center justify-end">
                             <div className="text-sm">
-                                <a href={`${ADMIN_BASE_PATH}/forgot-password`} className="font-medium text-[#c2185b] hover:text-[#9c1349]">
+                                <a href="/admin/forgot-password" className="font-medium text-[#c2185b] hover:text-[#9c1349]">
                                     Forgot your password?
                                 </a>
                             </div>
