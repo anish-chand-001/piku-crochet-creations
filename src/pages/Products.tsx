@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Loader2, X, ChevronLeft, ChevronRight, Plus, Minus, ShoppingCart } from "lucide-react";
@@ -42,11 +42,41 @@ const ProductDetailModal = ({ product, onClose }: ProductDetailModalProps) => {
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
   const { addToCart, isAdding } = useCart();
   const { isAuthenticated } = useUserAuth();
 
   const prev = () => setActiveIdx((i) => (i - 1 + images.length) % images.length);
   const next = () => setActiveIdx((i) => (i + 1) % images.length);
+  const swipeThreshold = 50;
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (images.length <= 1) return;
+    swipeStartRef.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!swipeStartRef.current || images.length <= 1) return;
+
+    const deltaX = e.clientX - swipeStartRef.current.x;
+    const deltaY = e.clientY - swipeStartRef.current.y;
+    swipeStartRef.current = null;
+
+    if (Math.abs(deltaX) < swipeThreshold || Math.abs(deltaX) <= Math.abs(deltaY)) {
+      return;
+    }
+
+    if (deltaX < 0) {
+      next();
+      return;
+    }
+
+    prev();
+  };
+
+  const resetSwipe = () => {
+    swipeStartRef.current = null;
+  };
 
   const handleAddToCart = () => {
     if (!isAuthenticated) {
@@ -96,7 +126,14 @@ const ProductDetailModal = ({ product, onClose }: ProductDetailModalProps) => {
             {/* ── Image Viewer ──────────────────────────────────────────── */}
             <div className="md:w-1/2 bg-gray-50 flex flex-col flex-shrink-0">
               {/* Main image */}
-              <div className="relative flex-1 min-h-[240px] md:min-h-0 overflow-hidden">
+              <div
+                className="relative flex-1 min-h-[240px] md:min-h-0 overflow-hidden"
+                style={{ touchAction: "pan-y" }}
+                onPointerDown={handlePointerDown}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={resetSwipe}
+                onPointerLeave={resetSwipe}
+              >
                 <AnimatePresence mode="wait">
                   <motion.img
                     key={activeIdx}
