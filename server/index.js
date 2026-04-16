@@ -35,22 +35,66 @@ app.use(session({
 // Passport (Google OAuth only — no persistent sessions, JWT handles auth)
 app.use(passport.initialize());
 
-// Database Connection (Serverless optimize)
-let isConnected = false;
+// Database connection cache for serverless reuse across warm invocations
+const globalMongoose = global.__mongoose || (global.__mongoose = {
+    conn: null,
+    promise: null,
+});
 
 const connectDB = async () => {
-    if (isConnected) return;
+    if (globalMongoose.conn && mongoose.connection.readyState === 1) {
+        return globalMongoose.conn;
+    }
+
+    if (globalMongoose.promise) {
+        return globalMongoose.promise;
+    }
+
+    const mongoUri = process.env.MONGODB_URI || (
+        process.env.NODE_ENV !== 'production'
+            ? 'mongodb://localhost:27017/crochet'
+            : null
+    );
+
+    if (!mongoUri) {
+        const error = new Error('MONGODB_URI is not configured');
+        console.error('MongoDB connection error:', error.message, {
+            hasMongoUri: Boolean(process.env.MONGODB_URI),
+            nodeEnv: process.env.NODE_ENV,
+        });
+        throw error;
+    }
+
     try {
-        const db = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/crochet');
-        isConnected = db.connections[0].readyState === 1;
-        console.log('MongoDB connected');
-    } catch (err) {
-        console.error('MongoDB connection error:', err);
+        console.log('MongoDB connect attempt', {
+            hasMongoUri: Boolean(process.env.MONGODB_URI),
+            nodeEnv: process.env.NODE_ENV,
+        });
+
+        globalMongoose.promise = mongoose.connect(mongoUri).then((mongooseInstance) => {
+            console.log('MongoDB connected');
+            return mongooseInstance;
+        });
+
+        globalMongoose.conn = await globalMongoose.promise;
+        return globalMongoose.conn;
+    } catch (error) {
+        globalMongoose.promise = null;
+        globalMongoose.conn = null;
+        console.error('MongoDB connection error:', error);
+        throw error;
     }
 };
 
-// Connect immediately (it'll cache across warm serverless functions)
-connectDB();
+// Ensure DB is ready before any route handler runs
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
 
 // Routes
 app.use('/api/admin', adminLimiter);
