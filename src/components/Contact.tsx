@@ -1,4 +1,4 @@
-import { Phone, Mail, Instagram, MessageCircle } from "lucide-react";
+import { Mail, Instagram } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
 import { motion } from "framer-motion";
 
@@ -10,14 +10,6 @@ const contactMethods = [
     value: "@pikucrochet",
     href: "https://instagram.com/pikucrochet",
     description: "DM us for orders",
-    colorClass: "bg-sage-light text-secondary-foreground",
-  },
-  {
-    icon: MessageCircle,
-    label: "WhatsApp",
-    value: "+91 87993 96601",
-    href: "https://wa.me/918799396601",
-    description: "Quick chat for orders",
     colorClass: "bg-sage-light text-secondary-foreground",
   },
   {
@@ -56,7 +48,7 @@ const Contact = () => {
           </p>
         </ScrollReveal>
 
-        <div className="grid gap-6 sm:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 max-w-2xl mx-auto">
           {contactMethods.map((method, index) => (
             <ScrollReveal key={method.label} delay={index * 0.1}>
               <motion.div
