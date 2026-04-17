@@ -1,5 +1,5 @@
 // Shared UPI configuration for payment QR code
-export const UPI_ID = import.meta.env.VITE_UPI_ID || 'anishchand9984@oksbi';
+export const UPI_ID = import.meta.env.VITE_UPI_ID || 'palakme0305@okicici';
 export const MERCHANT_NAME = 'Piku Crochet Creations';
 
 /**
