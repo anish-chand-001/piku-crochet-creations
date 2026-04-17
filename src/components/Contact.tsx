@@ -21,7 +21,6 @@ const contactMethods = [
     colorClass: "bg-rose-light text-primary",
   },
   
-  
 ];
 
 

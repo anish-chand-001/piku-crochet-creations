@@ -5,24 +5,24 @@ import { ChevronDown } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-import product1 from "@/assets/product-1.jpg";
-import product2 from "@/assets/product-2.jpg";
-import product3 from "@/assets/product-3.jpg";
-import product4 from "@/assets/product-4.jpg";
-import product5 from "@/assets/product-5.jpg";
-import product6 from "@/assets/product-6.jpg";
-import product7 from "@/assets/product-7.jpg";
-import product8 from "@/assets/product-8.jpg";
-import product9 from "@/assets/product-9.jpg";
-import product10 from "@/assets/product-10.jpg";
-import product11 from "@/assets/product-11.jpg";
-import product12 from "@/assets/product-12.jpg";
+import product1 from "@/assets/Product-1.jpeg";
+import product2 from "@/assets/Product-2.jpeg";
+import product3 from "@/assets/Product-3.jpeg";
+import product4 from "@/assets/Product-4.jpeg";
+import product5 from "@/assets/Product-5.jpeg";
+import product6 from "@/assets/Product-6.jpeg";
+import product7 from "@/assets/Product-7.jpeg";
+import product8 from "@/assets/Product-8.jpeg";
+import product9 from "@/assets/Product-9.jpeg";
+import product10 from "@/assets/Product-10.jpeg";
+import product11 from "@/assets/Product-11.jpeg";
+import product12 from "@/assets/Product-12.jpeg";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const row1 = [product1, product2, product3, product4, product1, product2, product3, product4];
-const row2 = [product5, product6, product7, product8, product5, product6, product7, product8];
-const row3 = [product9, product10, product11, product12, product9, product10, product11, product12];
+const row1 = [product1, product2, product3, product4, product5, product6, product7, product8];
+const row2 = [product9, product10, product11, product12, product1, product2, product3, product4];
+const row3 = [product5, product6, product7, product8, product9, product10, product11, product12];
 
 const Hero = () => {
   const sectionRef = useRef<HTMLElement>(null);
