@@ -256,7 +256,6 @@ const ProductDetailModal = ({ product, onClose }: ProductDetailModalProps) => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <div className="mt-6 space-y-3">
                 <button
                   onClick={handleAddToCart}
@@ -275,14 +274,6 @@ const ProductDetailModal = ({ product, onClose }: ProductDetailModalProps) => {
                     </>
                   )}
                 </button>
-                <a
-                  href="https://wa.me/8799396601"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-center rounded-full border-2 border-gray-200 px-8 py-3.5 font-body text-sm font-bold uppercase tracking-widest text-gray-700 transition-all duration-300 hover:border-primary hover:text-primary hover:-translate-y-0.5"
-                >
-                  Order via WhatsApp
-                </a>
               </div>
             </div>
           </div>
@@ -435,16 +426,8 @@ const Products = () => {
                 Love what you see?
               </h3>
               <p className="mx-auto mb-10 max-w-xl font-body text-xl text-gray-300 leading-relaxed relative z-10">
-                To place an order, simply reach out via WhatsApp, Instagram, or email. Every piece starts with a conversation.
+                To place an order, simply reach out via Instagram or email. Every piece starts with a conversation.
               </p>
-              <a
-                href="https://wa.me/8799396601"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative z-10 inline-flex items-center rounded-full bg-primary px-12 py-5 font-body text-sm font-bold uppercase tracking-widest text-white shadow-xl shadow-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/40"
-              >
-                Order via WhatsApp
-              </a>
             </div>
           </ScrollReveal>
         </div>
@@ -462,3 +445,4 @@ const Products = () => {
 };
 
 export default Products;
+
