@@ -21,7 +21,7 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const { setUser } = useUserAuth();
+    const { setUser, refreshAuth } = useUserAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const authError = searchParams.get('error');
@@ -48,7 +48,9 @@ const Login = () => {
                 return;
             }
 
-            setUser(data.user);
+            // Await the global state refresh to grab wishlist data natively before navigating
+            await refreshAuth();
+            
             toast.success(`Welcome back, ${data.user.name}!`);
             navigate('/');
         } catch {
