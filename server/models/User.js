@@ -45,7 +45,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['user'],
         default: 'user'
-    }
+    },
+    // Optional wishlist linked to Product references
+    wishlist: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product'
+    }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useCardTilt } from "@/hooks/useCardTilt";
-import { ShoppingCart, Loader2 } from "lucide-react";
+import { ShoppingCart, Loader2, Heart } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/hooks/useCart";
 import { useUserAuth } from "@/contexts/UserAuthContext";
@@ -36,8 +36,25 @@ interface ProductCardProps {
 const ProductCard = ({ product, image, index = 0 }: ProductCardProps) => {
   const { ref, onMouseMove, onMouseLeave } = useCardTilt(6);
   const { addToCart, isAdding } = useCart();
-  const { isAuthenticated } = useUserAuth();
+  const { isAuthenticated, wishlist, toggleWishlist } = useUserAuth();
   const [showCartFeedback, setShowCartFeedback] = useState(false);
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+
+  const isWishlisted = isAuthenticated && wishlist?.includes(product._id || '');
+
+  const handleWishlistClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      window.location.href = '/login';
+      return;
+    }
+    
+    if (product._id) {
+      setIsWishlistLoading(true);
+      await toggleWishlist(product._id);
+      setIsWishlistLoading(false);
+    }
+  };
 
   const handleQuickAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent opening the modal
@@ -85,6 +102,20 @@ const ProductCard = ({ product, image, index = 0 }: ProductCardProps) => {
             {product.category}
           </span>
 
+          {/* Wishlist button */}
+          <button
+            onClick={handleWishlistClick}
+            disabled={isWishlistLoading}
+            className="absolute right-4 top-4 w-9 h-9 opacity-0 group-hover:opacity-100 sm:opacity-100 rounded-full bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-white transition-all hover:scale-110 disabled:opacity-60 z-10"
+            aria-label="Toggle wishlist"
+          >
+            {isWishlistLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
+            ) : (
+              <Heart className={`w-4 h-4 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
+            )}
+          </button>
+
           {/* Quick add button on hover */}
           <motion.button
             onClick={handleQuickAddToCart}
@@ -124,6 +155,34 @@ const ProductCard = ({ product, image, index = 0 }: ProductCardProps) => {
           <p className="font-display text-xl font-bold text-primary mt-auto">
             {formatPrice(product.price)}
           </p>
+
+          {/* New standard buttons for explicitly better UX */}
+          <div className="mt-4 flex flex-col gap-2 relative z-20">
+            <button
+              onClick={handleQuickAddToCart}
+              disabled={isAdding}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              {isAdding ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShoppingCart className="w-4 h-4" />}
+              Add to Cart
+            </button>
+            <button
+              onClick={handleWishlistClick}
+              disabled={isWishlistLoading}
+              className={`w-full inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 ${
+                isWishlisted 
+                  ? "border-red-200 bg-red-50 text-red-600 hover:bg-red-100" 
+                  : "border-gray-200 bg-white text-gray-900 hover:bg-gray-50"
+              }`}
+            >
+              {isWishlistLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Heart className={`w-4 h-4 ${isWishlisted ? "fill-red-600" : ""}`} />
+              )}
+              {isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+            </button>
+          </div>
         </div>
       </div>
     </motion.div >

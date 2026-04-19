@@ -8,6 +8,7 @@ interface AdminUser {
     name: string;
     email: string;
     createdAt: string;
+    wishlist?: string[];
 }
 
 interface AdminUsersResponse {
@@ -78,6 +79,7 @@ const AdminUsers = () => {
                                 <tr>
                                     <th className="px-5 py-4 font-semibold uppercase tracking-wider text-xs">Name</th>
                                     <th className="px-5 py-4 font-semibold uppercase tracking-wider text-xs">Email</th>
+                                    <th className="px-5 py-4 font-semibold uppercase tracking-wider text-xs">Wishlist</th>
                                     <th className="px-5 py-4 font-semibold uppercase tracking-wider text-xs">Joined Date</th>
                                 </tr>
                             </thead>
@@ -86,6 +88,15 @@ const AdminUsers = () => {
                                     <tr key={user._id} className="hover:bg-gray-50/50 transition-colors">
                                         <td className="px-5 py-4 font-medium text-gray-900">{user.name}</td>
                                         <td className="px-5 py-4 text-gray-600">{user.email}</td>
+                                        <td className="px-5 py-4 text-gray-600">
+                                            {user.wishlist && user.wishlist.length > 0 ? (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                    {user.wishlist.length} item{user.wishlist.length !== 1 ? 's' : ''}
+                                                </span>
+                                            ) : (
+                                                <span className="text-gray-400 text-xs">-</span>
+                                            )}
+                                        </td>
                                         <td className="px-5 py-4 text-gray-600 whitespace-nowrap">
                                             {new Date(user.createdAt).toLocaleDateString()}
                                         </td>

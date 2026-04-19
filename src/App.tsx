@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
+import Wishlist from "./pages/Wishlist";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import GoogleCallback from "./pages/auth/GoogleCallback";
@@ -79,6 +80,7 @@ const AppShell = () => {
         <Route path="/cart" element={<UserProtectedRoute><Cart /></UserProtectedRoute>} />
         <Route path="/checkout" element={<UserProtectedRoute><Checkout /></UserProtectedRoute>} />
         <Route path="/orders" element={<UserProtectedRoute><Orders /></UserProtectedRoute>} />
+        <Route path="/wishlist" element={<UserProtectedRoute><Wishlist /></UserProtectedRoute>} />
 
         {/* Admin auth routes */}
         <Route path={`${ADMIN_BASE_PATH}/login`} element={<AdminLogin />} />

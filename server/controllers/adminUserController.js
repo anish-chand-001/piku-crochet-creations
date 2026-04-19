@@ -8,7 +8,7 @@ exports.getUsers = async (req, res) => {
 
         const [users, totalUsers] = await Promise.all([
             User.find({})
-                .select('name email createdAt')
+                .select('name email createdAt wishlist')
                 .sort({ createdAt: -1 })
                 .limit(limit)
                 .skip(skip),
