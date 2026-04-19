@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { API_URL } from '@/config/api';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface User {
     userId: string;
@@ -38,6 +39,7 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
     const [user, setUser] = useState<User | null>(null);
     const [wishlist, setWishlist] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const queryClient = useQueryClient();
 
     const refreshAuth = async () => {
         try {
@@ -82,6 +84,12 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
         }
         setUser(null);
         setWishlist([]);
+
+        // Strip only user-specific state slices to prevent stale session crossover securely
+        queryClient.removeQueries({ queryKey: ['wishlistDisplay'] });
+        queryClient.removeQueries({ queryKey: ['userCart'] });
+        queryClient.removeQueries({ queryKey: ['cartCount'] });
+        queryClient.removeQueries({ queryKey: ['userOrders'] });
     };
 
     const toggleWishlist = async (productId: string) => {

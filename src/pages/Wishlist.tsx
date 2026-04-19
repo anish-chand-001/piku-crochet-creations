@@ -20,7 +20,7 @@ interface PopulatedProduct {
 }
 
 const Wishlist = () => {
-  const { isAuthenticated, isLoading: authLoading } = useUserAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useUserAuth();
   const navigate = useNavigate();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -32,7 +32,7 @@ const Wishlist = () => {
   }, [isAuthenticated, authLoading, navigate]);
 
   const { data, isLoading: queryLoading } = useQuery({
-    queryKey: ['wishlistDisplay'],
+    queryKey: ['wishlistDisplay', user?.userId],
     queryFn: async () => {
       const res = await fetch(`${API_URL}/wishlist`, { credentials: 'include' });
       if (res.status === 401) {
