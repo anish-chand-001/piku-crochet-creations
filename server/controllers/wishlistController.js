@@ -10,6 +10,10 @@ exports.addToWishlist = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
+        if (!user.wishlist) {
+            user.wishlist = [];
+        }
+
         if (!user.wishlist.includes(productId)) {
             user.wishlist.push(productId);
             await user.save();
@@ -32,6 +36,10 @@ exports.removeFromWishlist = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
+        if (!user.wishlist) {
+            user.wishlist = [];
+        }
+
         user.wishlist = user.wishlist.filter(id => id.toString() !== productId);
         await user.save();
 
@@ -52,7 +60,7 @@ exports.getWishlist = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.status(200).json({ wishlist: user.wishlist });
+        res.status(200).json({ wishlist: user.wishlist || [] });
     } catch (error) {
         console.error('Get wishlist error:', error);
         res.status(500).json({ message: 'Server error fetching wishlist' });

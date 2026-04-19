@@ -46,11 +46,13 @@ export const UserAuthProvider = ({ children }: { children: React.ReactNode }) =>
                 const data = await res.json();
                 setUser(data.user);
                 
-                // Fetch wishlist silently on auth refresh
                 const wishRes = await fetch(`${API_URL}/wishlist`, { credentials: 'include' });
                 if (wishRes.ok) {
                     const wishData = await wishRes.json();
-                    setWishlist(wishData.wishlist.map((item: any) => item._id || item));
+                    const safeWishlist = wishData.wishlist || [];
+                    setWishlist(safeWishlist.map((item: any) => item._id || item));
+                } else {
+                    setWishlist([]);
                 }
             } else {
                 setUser(null);
