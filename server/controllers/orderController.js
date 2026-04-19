@@ -30,7 +30,25 @@ exports.createOrder = async (req, res) => {
 
         const name = sanitizeString(req.body.name) || (user ? user.name : '');
         let mobile = sanitizeString(req.body.mobile);
+        
+        const addressLine = sanitizeString(req.body.addressLine);
+        const pincode = sanitizeString(req.body.pincode);
+        const city = sanitizeString(req.body.city);
+        const state = sanitizeString(req.body.state);
+        const apartment = sanitizeString(req.body.apartment);
+        const houseNumber = sanitizeString(req.body.houseNumber);
+
         let address = sanitizeString(req.body.address);
+
+        // Generate full address string for backward compatibility
+        if (!address && pincode && city && state) {
+            const parts = [];
+            if (houseNumber) parts.push(houseNumber);
+            if (apartment) parts.push(apartment);
+            if (addressLine) parts.push(addressLine);
+            parts.push(`${city}, ${state} ${pincode}`);
+            address = parts.join(', ');
+        }
 
         // Fallback to storing values if they exist and request was empty
         if (user) {
@@ -79,14 +97,14 @@ exports.createOrder = async (req, res) => {
         }
 
         const items = [];
-        let totalAmount = 0;
+        let itemsTotal = 0;
 
         for (const cartItem of cart.items) {
             const product = cartItem.productId;
             if (!product) continue;
             const image = product.images?.[0] || product.imageUrl || '';
             const itemTotal = product.price * cartItem.quantity;
-            totalAmount += itemTotal;
+            itemsTotal += itemTotal;
             items.push({
                 productId: product._id,
                 name: product.name,
@@ -100,6 +118,9 @@ exports.createOrder = async (req, res) => {
             return res.status(400).json({ message: 'No valid products in cart' });
         }
 
+        const shippingCharge = 150;
+        const totalAmount = itemsTotal + shippingCharge;
+
 
 
         const order = await Order.create({
@@ -108,8 +129,15 @@ exports.createOrder = async (req, res) => {
             email: user?.email || req.user.email,
             mobile,
             address,
+            pincode,
+            city,
+            state,
+            apartment,
+            houseNumber,
+            addressLine,
             items,
             totalAmount,
+            shippingCharge,
             paymentStatus: 'pending_payment',
             paymentLog: {
                 amount: totalAmount,
@@ -129,6 +157,20 @@ exports.createOrder = async (req, res) => {
             }
             if (!user.address || user.address === '') {
                 user.address = address;
+                profileUpdated = true;
+            }
+            // Update savedAddress with structured details
+            if (pincode && city && state) {
+                user.savedAddress = {
+                    fullName: name,
+                    mobile,
+                    addressLine,
+                    pincode,
+                    city,
+                    state,
+                    apartment,
+                    houseNumber
+                };
                 profileUpdated = true;
             }
             if (profileUpdated) {

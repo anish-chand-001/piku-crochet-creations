@@ -46,19 +46,23 @@ const About = () => {
           <div className="space-y-6">
             <ScrollReveal delay={0.1}>
               <p className="font-body text-lg leading-relaxed text-foreground/80">
-                At <span className="font-semibold text-primary">Piku Crochet</span>,
-                every creation begins with a single loop of yarn and a heart full of
-                intention. We believe in the beauty of slow craft — where each stitch
-                carries warmth, patience, and a little piece of the maker's soul.
+                {/* At <span className="font-semibold text-primary">Piku Crochet</span>, */}
+                It all started right after 12th, during a simple day of cleaning at home.
+                In an old drawer, I found something unfamiliar—a crochet hook wrapped in yarn.
+                Curious, I decided to try it out, even though it wasn’t easy at first.
+                The hook was too small, the yarn didn’t cooperate, and nothing went as planned.
+                But instead of giving up, I learned, adjusted, and eventually created my very
+                first piece—simple, in blue and yellow, but deeply meaningful because it marked the beginning.
               </p>
             </ScrollReveal>
 
             <ScrollReveal delay={0.2}>
               <p className="font-body text-lg leading-relaxed text-foreground/80">
-                Our pieces aren't just products — they're handmade companions,
-                gifts wrapped in emotion, and keepsakes designed to last. From
-                delicate flowers that never wilt to plushies that feel like a warm hug,
-                we pour love into every tiny detail.
+                What began as a small moment of curiosity soon turned into a genuine passion.
+                Today, I create and sell handcrafted crochet pieces, with a special focus on
+                customization—bringing unique ideas to life instead of repeating the same designs.
+                From that unexpected discovery in a drawer to building this brand, the journey has
+                been all about creativity, learning, and growth—and it’s only just getting started.
               </p>
             </ScrollReveal>
 

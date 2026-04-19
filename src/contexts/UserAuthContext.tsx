@@ -8,6 +8,16 @@ interface User {
     role: string;
     mobile?: string;
     address?: string;
+    savedAddress?: {
+        fullName: string;
+        mobile: string;
+        addressLine: string;
+        pincode: string;
+        city: string;
+        state: string;
+        apartment?: string;
+        houseNumber?: string;
+    } | null;
 }
 
 interface UserAuthContextType {

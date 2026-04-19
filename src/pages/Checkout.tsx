@@ -24,9 +24,16 @@ const Checkout = () => {
     const { user } = useUserAuth();
 
     const [step, setStep] = useState<Step>('details');
-    const [name, setName] = useState(user?.name || '');
-    const [mobile, setMobile] = useState(user?.mobile || '');
-    const [address, setAddress] = useState(user?.address || '');
+    const [name, setName] = useState(user?.savedAddress?.fullName || user?.name || '');
+    const [mobile, setMobile] = useState(user?.savedAddress?.mobile || user?.mobile || '');
+    
+    // Prefill with structured address if available, otherwise just use old address string in addressLine
+    const [addressLine, setAddressLine] = useState(user?.savedAddress?.addressLine || (!user?.savedAddress ? (user?.address || '') : ''));
+    const [pincode, setPincode] = useState(user?.savedAddress?.pincode || '');
+    const [city, setCity] = useState(user?.savedAddress?.city || '');
+    const [state, setState] = useState(user?.savedAddress?.state || '');
+    const [apartment, setApartment] = useState(user?.savedAddress?.apartment || '');
+    const [houseNumber, setHouseNumber] = useState(user?.savedAddress?.houseNumber || '');
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [orderId, setOrderId] = useState('');
 
@@ -48,7 +55,7 @@ const Checkout = () => {
                     'X-Requested-With': 'XMLHttpRequest'
                 },
                 credentials: 'include',
-                body: JSON.stringify({ name, mobile, address })
+                body: JSON.stringify({ name, mobile, addressLine, pincode, city, state, apartment, houseNumber })
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || 'Order creation failed');
@@ -68,13 +75,18 @@ const Checkout = () => {
         if (!name.trim()) e.name = 'Name is required';
         if (!mobile.trim()) e.mobile = 'Mobile number is required';
         else if (!/^[6-9]\d{9}$/.test(mobile.trim())) e.mobile = 'Enter a valid 10-digit mobile number';
-        if (!address.trim() || address.trim().length < 10) e.address = 'Please enter a complete delivery address';
+        if (!addressLine.trim() && addressLine.length < 5) e.addressLine = 'Street address is required';
+        if (!city.trim()) e.city = 'City is required';
+        if (!state.trim()) e.state = 'State is required';
+        if (!pincode.trim() || !/^\d{6}$/.test(pincode.trim())) e.pincode = 'Valid 6-digit PIN code is required';
+        
         setErrors(e);
         return Object.keys(e).length === 0;
     };
 
+    const SHIPPING_CHARGE = 150;
     const items = cart?.items || [];
-    const total = cart?.total || 0;
+    const total = (cart?.total || 0) + SHIPPING_CHARGE;
     if (cartLoading) {
         return <div className="min-h-screen pt-28 flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
     }
@@ -139,20 +151,51 @@ const Checkout = () => {
                                     {errors.mobile && <p className="text-xs text-red-600">{errors.mobile}</p>}
                                 </div>
 
-                                <div className="space-y-1.5">
-                                    <label className="font-body text-sm font-medium text-gray-700 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Delivery Address</label>
-                                    <textarea
-                                        value={address}
-                                        onChange={e => setAddress(e.target.value)}
-                                        placeholder="House no., Street, City, State, PIN code"
-                                        rows={3}
-                                        className={`${inputCls('address')} resize-none`}
-                                    />
-                                    {errors.address && <p className="text-xs text-red-600">{errors.address}</p>}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="font-body text-sm font-medium text-gray-700">House No. <span className="text-gray-400 font-normal">(Optional)</span></label>
+                                        <input type="text" value={houseNumber} onChange={e => setHouseNumber(e.target.value)} placeholder="House/Flat No." className={inputCls('houseNumber')} />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="font-body text-sm font-medium text-gray-700">Apartment <span className="text-gray-400 font-normal">(Optional)</span></label>
+                                        <input type="text" value={apartment} onChange={e => setApartment(e.target.value)} placeholder="Apartment/Society" className={inputCls('apartment')} />
+                                    </div>
                                 </div>
-                                {(user?.mobile && user?.address) && (
+
+                                <div className="space-y-1.5">
+                                    <label className="font-body text-sm font-medium text-gray-700 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Address Line</label>
+                                    <textarea
+                                        value={addressLine}
+                                        onChange={e => setAddressLine(e.target.value)}
+                                        placeholder="Street name, landmark, area"
+                                        rows={2}
+                                        className={`${inputCls('addressLine')} resize-none`}
+                                    />
+                                    {errors.addressLine && <p className="text-xs text-red-600">{errors.addressLine}</p>}
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="font-body text-sm font-medium text-gray-700">City</label>
+                                        <input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder="City" className={inputCls('city')} />
+                                        {errors.city && <p className="text-xs text-red-600">{errors.city}</p>}
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="font-body text-sm font-medium text-gray-700">State</label>
+                                        <input type="text" value={state} onChange={e => setState(e.target.value)} placeholder="State" className={inputCls('state')} />
+                                        {errors.state && <p className="text-xs text-red-600">{errors.state}</p>}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="font-body text-sm font-medium text-gray-700">PIN Code</label>
+                                    <input type="text" value={pincode} onChange={e => setPincode(e.target.value)} placeholder="6-digit PIN" maxLength={6} className={inputCls('pincode')} />
+                                    {errors.pincode && <p className="text-xs text-red-600">{errors.pincode}</p>}
+                                </div>
+
+                                {(user?.savedAddress || user?.address) && (
                                     <p className="font-body text-xs text-green-600 flex items-center gap-1 mt-2">
-                                        <CheckCircle2 className="w-3 h-3" /> Using your saved delivery details. You can edit them above if needed.
+                                        <CheckCircle2 className="w-3 h-3" /> Using your saved details. You can edit them above.
                                     </p>
                                 )}
                             </div>
@@ -168,9 +211,16 @@ const Checkout = () => {
                                         </div>
                                     ))}
                                 </div>
-                                <div className="border-t pt-3 flex justify-between">
-                                    <span className="font-display font-bold text-gray-900">Total</span>
-                                    <span className="font-display font-extrabold text-primary text-lg">{formatPrice(total)}</span>
+                                <div className="border-t pt-3 space-y-2">
+                                    <div className="flex justify-between text-sm font-body text-gray-600">
+                                        <span>Shipping</span>
+                                        <span>{formatPrice(SHIPPING_CHARGE)}</span>
+                                    </div>
+                                    <p className="text-xs text-green-600 font-medium">If distance is near cashback would be done</p>
+                                    <div className="flex justify-between mt-2 pt-2 border-t border-gray-50">
+                                        <span className="font-display font-bold text-gray-900">Total</span>
+                                        <span className="font-display font-extrabold text-primary text-lg">{formatPrice(total)}</span>
+                                    </div>
                                 </div>
                             </div>
 

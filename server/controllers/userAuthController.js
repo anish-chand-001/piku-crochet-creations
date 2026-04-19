@@ -106,7 +106,7 @@ exports.logout = (req, res) => {
 exports.checkAuth = async (req, res) => {
     try {
         // Fetch fresh profile from DB — JWT doesn't carry mobile/address
-        const user = await User.findById(req.user.userId).select('name email role mobile address');
+        const user = await User.findById(req.user.userId).select('name email role mobile address savedAddress');
         if (!user) return res.status(401).json({ message: 'User not found' });
 
         res.json({
@@ -117,7 +117,8 @@ exports.checkAuth = async (req, res) => {
                 email: user.email,
                 role: user.role,
                 mobile: user.mobile || '',
-                address: user.address || ''
+                address: user.address || '',
+                savedAddress: user.savedAddress || null
             }
         });
     } catch (error) {

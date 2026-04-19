@@ -13,6 +13,7 @@ import Orders from "./pages/Orders";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import GoogleCallback from "./pages/auth/GoogleCallback";
+import FAQ from "./pages/FAQ";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { useSmoothScroll } from "./hooks/useSmoothScroll";
@@ -72,6 +73,7 @@ const AppShell = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/auth/callback" element={<GoogleCallback />} />
+        <Route path="/faq" element={<FAQ />} />
 
         {/* Protected user routes */}
         <Route path="/cart" element={<UserProtectedRoute><Cart /></UserProtectedRoute>} />

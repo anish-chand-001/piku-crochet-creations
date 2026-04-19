@@ -31,6 +31,16 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    savedAddress: {
+        fullName: { type: String, default: '' },
+        mobile: { type: String, default: '' },
+        addressLine: { type: String, default: '' },
+        pincode: { type: String, default: '' },
+        city: { type: String, default: '' },
+        state: { type: String, default: '' },
+        apartment: { type: String, default: '' },
+        houseNumber: { type: String, default: '' }
+    },
     role: {
         type: String,
         enum: ['user'],

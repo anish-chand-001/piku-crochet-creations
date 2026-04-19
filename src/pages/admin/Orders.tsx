@@ -12,6 +12,13 @@ interface Order {
     email: string;
     mobile: string;
     address: string;
+    pincode?: string;
+    city?: string;
+    state?: string;
+    apartment?: string;
+    houseNumber?: string;
+    addressLine?: string;
+    shippingCharge?: number;
     items: OrderItem[];
     totalAmount: number;
     paymentStatus: 'pending' | 'paid';
@@ -104,8 +111,25 @@ const AdminOrders = () => {
                                             <td className="px-5 py-4 text-gray-600 whitespace-nowrap">{date}</td>
                                             <td className="px-5 py-4">
                                                 <div className="font-medium text-gray-900">{order.name}</div>
-                                                <div className="text-xs text-gray-500">{order.email}</div>
-                                                <div className="text-xs text-gray-400 mt-0.5 break-words">{order.address}</div>
+                                                <div className="text-xs text-gray-500 mb-1">{order.email}</div>
+                                                
+                                                <div className="text-[10px] uppercase font-bold text-gray-400 mt-2 mb-0.5">Address</div>
+                                                {order.city && order.state ? (
+                                                    <div className="text-xs text-gray-600 space-y-0.5 leading-relaxed max-w-[220px]">
+                                                        {(order.houseNumber || order.apartment) && (
+                                                            <div>
+                                                                {order.houseNumber && <span>{order.houseNumber}</span>}
+                                                                {order.houseNumber && order.apartment && <span>, </span>}
+                                                                {order.apartment && <span>{order.apartment}</span>}
+                                                            </div>
+                                                        )}
+                                                        <div className="break-words">{order.addressLine || order.address}</div>
+                                                        <div>{order.city}, {order.state}</div>
+                                                        <div className="font-medium text-gray-800">PIN: {order.pincode}</div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-xs text-gray-500 mt-0.5 break-words max-w-[220px]">{order.address}</div>
+                                                )}
                                             </td>
                                             <td className="px-5 py-4">
                                                 <span className="text-gray-700">{order.mobile}</span>
@@ -124,8 +148,11 @@ const AdminOrders = () => {
                                                     ))}
                                                 </div>
                                             </td>
-                                            <td className="px-5 py-4 font-semibold text-gray-900 whitespace-nowrap">
-                                                {formatPrice(order.totalAmount)}
+                                            <td className="px-5 py-4 whitespace-nowrap">
+                                                <div className="font-semibold text-gray-900">{formatPrice(order.totalAmount)}</div>
+                                                {order.shippingCharge !== undefined && (
+                                                    <div className="text-[10px] text-gray-400 mt-0.5">Includes {formatPrice(order.shippingCharge)} shipping</div>
+                                                )}
                                             </td>
                                             <td className="px-5 py-4">
                                                 <select

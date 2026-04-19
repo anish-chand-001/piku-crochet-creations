@@ -142,10 +142,11 @@ exports.getProducts = async (req, res) => {
         const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
         const search = sanitizeString(req.query.search || '');
         const category = sanitizeString(req.query.category || '');
+        const sortQuery = req.query.sort || '';
 
         const query = {};
         let sort = { createdAt: -1 };
-        const projection = { name: 1, price: 1, description: 1, category: 1, imageUrl: 1, images: 1, createdAt: 1 };
+        const projection = { name: 1, price: 1, description: 1, category: 1, imageUrl: 1, images: 1, createdAt: 1, soldCount: 1 };
 
         if (search) {
             query.$text = { $search: search };
@@ -156,7 +157,28 @@ exports.getProducts = async (req, res) => {
             query.category = category;
         }
 
-        const cacheKey = !search && !category ? `products:${page}:${limit}` : null;
+        const minPrice = req.query.minPrice;
+        const maxPrice = req.query.maxPrice;
+
+        if (minPrice || maxPrice) {
+            query.price = {};
+            if (minPrice) {
+                query.price.$gte = Number(minPrice);
+            }
+            if (maxPrice) {
+                query.price.$lte = Number(maxPrice);
+            }
+        }
+
+        if (sortQuery === "price_asc") {
+            sort = { price: 1 };
+        } else if (sortQuery === "price_desc") {
+            sort = { price: -1 };
+        } else if (sortQuery === "popular") {
+            sort = { soldCount: -1, createdAt: -1 };
+        }
+
+        const cacheKey = !search && !category && !sortQuery && !minPrice && !maxPrice ? `products:${page}:${limit}` : null;
         if (cacheKey) {
             const cached = getCache(cacheKey);
             if (cached) {

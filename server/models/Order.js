@@ -30,8 +30,16 @@ const orderSchema = new mongoose.Schema({
     email: { type: String, required: true },
     mobile: { type: String, required: true },
     address: { type: String, required: true },
+    // Structured delivery details snapshot
+    pincode: { type: String },
+    city: { type: String },
+    state: { type: String },
+    apartment: { type: String },
+    houseNumber: { type: String },
+    addressLine: { type: String },
     items: [orderItemSchema],
     totalAmount: { type: Number, required: true },
+    shippingCharge: { type: Number, default: 0 },
     paymentStatus: {
         type: String,
         enum: ['pending_payment', 'confirmed', 'failed'],
