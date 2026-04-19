@@ -102,13 +102,15 @@ const Navbar = () => {
         {/* Right: Cart + User */}
         <div className="hidden md:flex items-center gap-3 z-50">
           {/* Wishlist icon */}
-          <Link
-            to={isAuthenticated ? "/wishlist" : "/login"}
-            className="relative p-2.5 rounded-full text-stone-600 hover:bg-stone-100 hover:text-[#E87EA1] transition-all"
-            aria-label="Wishlist"
-          >
-            <Heart className="w-5 h-5" />
-          </Link>
+          {isAuthenticated && (
+            <Link
+              to="/wishlist"
+              className="relative p-2.5 rounded-full text-stone-600 hover:bg-stone-100 hover:text-[#E87EA1] transition-all"
+              aria-label="Wishlist"
+            >
+              <Heart className="w-5 h-5" />
+            </Link>
+          )}
 
           {/* Cart icon */}
           <Link
@@ -181,13 +183,15 @@ const Navbar = () => {
 
         {/* Mobile: Cart + Toggle */}
         <div className="flex md:hidden items-center gap-2 z-50">
-          <Link
-            to={isAuthenticated ? "/wishlist" : "/login"}
-            className="relative p-2 rounded-full text-stone-600 hover:bg-stone-100 transition-all"
-            aria-label="Wishlist"
-          >
-            <Heart className="w-5 h-5" />
-          </Link>
+          {isAuthenticated && (
+            <Link
+              to="/wishlist"
+              className="relative p-2 rounded-full text-stone-600 hover:bg-stone-100 transition-all"
+              aria-label="Wishlist"
+            >
+              <Heart className="w-5 h-5" />
+            </Link>
+          )}
           <Link
             to={isAuthenticated ? "/cart" : "/login"}
             className="relative p-2 rounded-full text-stone-600 hover:bg-stone-100 transition-all"

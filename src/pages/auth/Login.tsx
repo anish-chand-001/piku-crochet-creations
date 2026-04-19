@@ -48,8 +48,8 @@ const Login = () => {
                 return;
             }
 
-            // Await the global state refresh to grab wishlist data natively before navigating
-            await refreshAuth();
+            setUser(data.user);
+            refreshAuth();
             
             toast.success(`Welcome back, ${data.user.name}!`);
             navigate('/');
