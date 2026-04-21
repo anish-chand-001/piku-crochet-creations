@@ -114,3 +114,54 @@ exports.addReview = async (req, res) => {
         res.status(500).json({ message: 'Error adding review' });
     }
 };
+
+exports.editReview = async (req, res) => {
+    try {
+        const { reviewId } = req.params;
+        const userId = req.user.userId;
+        let { rating, comment } = req.body;
+
+        if (!validateObjectId(reviewId)) {
+            return res.status(400).json({ message: 'Invalid review id' });
+        }
+
+        rating = Number(rating);
+        if (isNaN(rating) || rating < 1 || rating > 5) {
+            return res.status(400).json({ message: 'Rating must be a number between 1 and 5' });
+        }
+
+        const review = await Review.findById(reviewId);
+        if (!review) {
+            return res.status(404).json({ message: 'Review not found' });
+        }
+
+        if (review.userId.toString() !== userId) {
+            return res.status(403).json({ message: 'Not authorized to edit this review' });
+        }
+
+        review.rating = rating;
+        review.comment = comment ? String(comment).trim().substring(0, 1000) : '';
+        await review.save();
+
+        // Calculate new average
+        const allReviews = await Review.find({ productId: review.productId });
+        const reviewCount = allReviews.length;
+        const totalRating = allReviews.reduce((sum, r) => sum + r.rating, 0);
+        const averageRating = totalRating / reviewCount;
+
+        await Product.findByIdAndUpdate(review.productId, {
+            averageRating: Number(averageRating.toFixed(1))
+        });
+
+        // Send back populated review
+        await review.populate('userId', 'name');
+
+        res.json({
+            message: 'Review updated successfully',
+            review
+        });
+    } catch (error) {
+        console.error('Edit review error:', error);
+        res.status(500).json({ message: 'Error editing review' });
+    }
+};

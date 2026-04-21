@@ -41,10 +41,16 @@ const ProductDetailModal = ({ product, onClose }: ProductDetailModalProps) => {
     const [comment, setComment] = useState("");
     const [isSubmittingReview, setIsSubmittingReview] = useState(false);
     const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+    
+    // Edit Review state
+    const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+    const [editRating, setEditRating] = useState(5);
+    const [editComment, setEditComment] = useState("");
+    const [isEditingSubmit, setIsEditingSubmit] = useState(false);
 
     const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
     const { addToCart, isAdding } = useCart();
-    const { isAuthenticated } = useUserAuth();
+    const { isAuthenticated, user } = useUserAuth();
 
     useEffect(() => {
         if (!product._id) return;
@@ -115,6 +121,33 @@ const ProductDetailModal = ({ product, onClose }: ProductDetailModalProps) => {
             console.error("Failed to submit review", err);
         } finally {
             setIsSubmittingReview(false);
+        }
+    };
+
+    const submitEditReview = async (e: React.FormEvent, reviewId: string) => {
+        e.preventDefault();
+        setIsEditingSubmit(true);
+        try {
+            const res = await fetch(`${API_URL}/reviews/${reviewId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                credentials: "include",
+                body: JSON.stringify({ rating: editRating, comment: editComment })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setReviews(reviews.map(r => r._id === reviewId ? data.review : r));
+                setEditingReviewId(null);
+            } else {
+                console.error("Edit review failed", await res.text());
+            }
+        } catch (err) {
+            console.error("Failed to edit review", err);
+        } finally {
+            setIsEditingSubmit(false);
         }
     };
 
@@ -392,27 +425,84 @@ const ProductDetailModal = ({ product, onClose }: ProductDetailModalProps) => {
                                     <div className="space-y-4">
                                         {reviews.map((review: any) => (
                                             <div key={review._id} className="bg-white border border-gray-100 p-4 rounded-xl shadow-sm">
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <div className="font-semibold text-sm text-gray-900 capitalize">
-                                                        {review.userId?.name || "Anonymous User"}
-                                                    </div>
-                                                    <div className="flex gap-0.5 text-yellow-400">
-                                                        {[...Array(5)].map((_, i) => (
-                                                            <Star
-                                                                key={i}
-                                                                className={`w-3.5 h-3.5 ${i < review.rating ? "fill-current" : "text-gray-200"}`}
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                                {review.comment && (
-                                                    <p className="text-sm text-gray-600 leading-relaxed mt-1">
-                                                        {review.comment}
-                                                    </p>
+                                                {editingReviewId === review._id ? (
+                                                    <form onSubmit={(e) => submitEditReview(e, review._id)} className="w-full">
+                                                        <h4 className="text-sm font-bold text-gray-800 mb-3">Edit Review</h4>
+                                                        <div className="flex gap-1 mb-3">
+                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                <button
+                                                                    key={star}
+                                                                    type="button"
+                                                                    onClick={() => setEditRating(star)}
+                                                                    className={`hover:scale-110 transition-transform py-1 px-0.5 ${star <= editRating ? "text-yellow-400" : "text-gray-300"}`}
+                                                                >
+                                                                    <Star className="w-6 h-6 fill-current" />
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                        <textarea
+                                                            value={editComment}
+                                                            onChange={(e) => setEditComment(e.target.value)}
+                                                            className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary mb-3 resize-none"
+                                                            rows={3}
+                                                        />
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                type="submit"
+                                                                disabled={isEditingSubmit}
+                                                                className="px-4 py-2 bg-gray-900 text-white text-sm font-bold rounded-lg hover:bg-black transition-colors disabled:opacity-50"
+                                                            >
+                                                                {isEditingSubmit ? "Saving..." : "Save"}
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setEditingReviewId(null)}
+                                                                disabled={isEditingSubmit}
+                                                                className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                                                            >
+                                                                Cancel
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                ) : (
+                                                    <>
+                                                        <div className="flex justify-between items-start mb-2">
+                                                            <div className="font-semibold text-sm text-gray-900 capitalize">
+                                                                {review.userId?.name || "Anonymous User"}
+                                                            </div>
+                                                            <div className="flex gap-0.5 text-yellow-400">
+                                                                {[...Array(5)].map((_, i) => (
+                                                                    <Star
+                                                                        key={i}
+                                                                        className={`w-3.5 h-3.5 ${i < review.rating ? "fill-current" : "text-gray-200"}`}
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        {review.comment && (
+                                                            <p className="text-sm text-gray-600 leading-relaxed mt-1">
+                                                                {review.comment}
+                                                            </p>
+                                                        )}
+                                                        <div className="mt-3 flex justify-between items-center">
+                                                            <div className="text-[11px] text-gray-400 uppercase tracking-wider">
+                                                                {new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                            </div>
+                                                            {user?.userId === review.userId?._id && (
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setEditingReviewId(review._id);
+                                                                        setEditRating(review.rating);
+                                                                        setEditComment(review.comment || "");
+                                                                    }}
+                                                                    className="text-xs font-bold text-gray-500 hover:text-gray-800 transition-colors"
+                                                                >
+                                                                    Edit
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </>
                                                 )}
-                                                <div className="text-[11px] text-gray-400 mt-3 uppercase tracking-wider">
-                                                    {new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                                </div>
                                             </div>
                                         ))}
                                     </div>

@@ -9,5 +9,6 @@ router.get('/:productId', reviewController.getReviews);
 // Protected routes
 router.get('/eligibility/:productId', userAuthMiddleware, reviewController.checkEligibility);
 router.post('/:productId', userAuthMiddleware, reviewController.addReview);
+router.put('/:reviewId', userAuthMiddleware, reviewController.editReview);
 
 module.exports = router;
