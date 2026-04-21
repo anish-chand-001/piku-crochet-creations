@@ -33,6 +33,14 @@ const productSchema = new mongoose.Schema({
             },
             message: `A product can have at most ${MAX_IMAGES} images.`
         }
+    },
+    averageRating: {
+        type: Number,
+        default: 0
+    },
+    reviewCount: {
+        type: Number,
+        default: 0
     }
 }, { timestamps: true });
 

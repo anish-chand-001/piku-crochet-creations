@@ -109,6 +109,7 @@ app.use('/api/auth', require('./routes/userAuth'));      // User auth + Google O
 app.use('/api/cart', require('./routes/cart'));          // Cart management
 app.use('/api/orders', require('./routes/orders'));      // Orders (user + admin)
 app.use('/api/wishlist', require('./routes/wishlist'));  // Wishlist management
+app.use('/api/reviews', require('./routes/reviews'));    // Product reviews
 
 app.get('/', (req, res) => {
     res.send('API is running...');

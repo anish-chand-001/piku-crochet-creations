@@ -1,9 +1,10 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, Plus, Minus, ShoppingCart, Loader2 } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Plus, Minus, ShoppingCart, Loader2, Star } from "lucide-react";
 import { formatPrice } from "@/components/ProductCard";
 import { useCart } from "@/hooks/useCart";
 import { useUserAuth } from "@/contexts/UserAuthContext";
+import { API_URL } from "@/config/api";
 
 export interface Product {
     _id?: string;
@@ -13,6 +14,8 @@ export interface Product {
     category: string;
     imageUrl?: string;
     images?: string[];
+    averageRating?: number;
+    reviewCount?: number;
 }
 
 interface ProductDetailModalProps {
@@ -30,9 +33,90 @@ const ProductDetailModal = ({ product, onClose }: ProductDetailModalProps) => {
 
     const [activeIdx, setActiveIdx] = useState(0);
     const [quantity, setQuantity] = useState(1);
+    
+    // Reviews state
+    const [reviews, setReviews] = useState<any[]>([]);
+    const [isEligible, setIsEligible] = useState(false);
+    const [rating, setRating] = useState(5);
+    const [comment, setComment] = useState("");
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+    const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+
     const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
     const { addToCart, isAdding } = useCart();
     const { isAuthenticated } = useUserAuth();
+
+    useEffect(() => {
+        if (!product._id) return;
+        
+        const fetchReviews = async () => {
+            try {
+                const res = await fetch(`${API_URL}/reviews/${product._id}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setReviews(data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch reviews", err);
+            } finally {
+                setIsLoadingReviews(false);
+            }
+        };
+        fetchReviews();
+
+        if (isAuthenticated) {
+            const checkEligibility = async () => {
+                try {
+                    const res = await fetch(`${API_URL}/reviews/eligibility/${product._id}`, { credentials: "include" });
+                    if (res.ok) {
+                        const data = await res.json();
+                        // Also verify there's no review by this user already fetched? 
+                        // Eligibility endpoint handles hasReviewed constraint directly
+                        setIsEligible(data.eligible);
+                    }
+                } catch (err) {
+                    console.error("Failed to check eligibility", err);
+                }
+            };
+            checkEligibility();
+        }
+    }, [product._id, isAuthenticated]);
+
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "auto";
+        };
+    }, []);
+
+    const submitReview = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!product._id) return;
+        setIsSubmittingReview(true);
+        try {
+            const res = await fetch(`${API_URL}/reviews/${product._id}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                credentials: "include",
+                body: JSON.stringify({ rating, comment })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setReviews([data.review, ...reviews]);
+                setIsEligible(false);
+                setComment("");
+            } else {
+                console.error("Submit review failed", await res.text());
+            }
+        } catch (err) {
+            console.error("Failed to submit review", err);
+        } finally {
+            setIsSubmittingReview(false);
+        }
+    };
 
     const prev = () => setActiveIdx((i) => (i - 1 + images.length) % images.length);
     const next = () => setActiveIdx((i) => (i + 1) % images.length);
@@ -100,6 +184,7 @@ const ProductDetailModal = ({ product, onClose }: ProductDetailModalProps) => {
                     exit={{ scale: 0.92, opacity: 0, y: 24 }}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     onClick={(e) => e.stopPropagation()}
+                    onWheel={(e) => e.stopPropagation()}
                 >
                     <button
                         onClick={onClose}
@@ -185,7 +270,7 @@ const ProductDetailModal = ({ product, onClose }: ProductDetailModalProps) => {
                             )}
                         </div>
 
-                        <div className="md:w-1/2 flex flex-col p-6 overflow-y-auto">
+                        <div className="md:w-1/2 flex flex-col p-6 overflow-y-auto overscroll-contain">
                             <span className="inline-block mb-3 text-xs font-semibold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full w-fit">
                                 {product.category}
                             </span>
@@ -254,6 +339,88 @@ const ProductDetailModal = ({ product, onClose }: ProductDetailModalProps) => {
                                         </>
                                     )}
                                 </button>
+                            </div>
+
+                            {/* Reviews Section */}
+                            <div className="mt-8 pt-8 border-t border-gray-100">
+                                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                    Customer Reviews
+                                    {product.reviewCount && product.reviewCount > 0 && (
+                                        <span className="text-sm font-normal text-gray-500">
+                                            ({product.reviewCount})
+                                        </span>
+                                    )}
+                                </h3>
+
+                                {isEligible && (
+                                    <form onSubmit={submitReview} className="mb-6 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                        <h4 className="text-sm font-bold text-gray-800 mb-3">Write a Review</h4>
+                                        <div className="flex gap-1 mb-3">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <button
+                                                    key={star}
+                                                    type="button"
+                                                    onClick={() => setRating(star)}
+                                                    className={`hover:scale-110 transition-transform py-1 px-0.5 ${star <= rating ? "text-yellow-400" : "text-gray-300"}`}
+                                                >
+                                                    <Star className="w-6 h-6 fill-current" />
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <textarea
+                                            value={comment}
+                                            onChange={(e) => setComment(e.target.value)}
+                                            placeholder="Tell us what you think... (optional)"
+                                            className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary mb-3 resize-none"
+                                            rows={3}
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={isSubmittingReview}
+                                            className="w-full sm:w-auto px-6 py-2.5 bg-gray-900 text-white text-sm font-bold rounded-lg hover:bg-black transition-colors disabled:opacity-50"
+                                        >
+                                            {isSubmittingReview ? "Submitting..." : "Submit Review"}
+                                        </button>
+                                    </form>
+                                )}
+
+                                {isLoadingReviews ? (
+                                    <div className="flex justify-center py-6">
+                                        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                                    </div>
+                                ) : reviews.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {reviews.map((review: any) => (
+                                            <div key={review._id} className="bg-white border border-gray-100 p-4 rounded-xl shadow-sm">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div className="font-semibold text-sm text-gray-900 capitalize">
+                                                        {review.userId?.name || "Anonymous User"}
+                                                    </div>
+                                                    <div className="flex gap-0.5 text-yellow-400">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <Star
+                                                                key={i}
+                                                                className={`w-3.5 h-3.5 ${i < review.rating ? "fill-current" : "text-gray-200"}`}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                {review.comment && (
+                                                    <p className="text-sm text-gray-600 leading-relaxed mt-1">
+                                                        {review.comment}
+                                                    </p>
+                                                )}
+                                                <div className="text-[11px] text-gray-400 mt-3 uppercase tracking-wider">
+                                                    {new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-gray-500 italic text-center py-8 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
+                                        No reviews yet. Be the first to share your thoughts!
+                                    </p>
+                                )}
                             </div>
                         </div>
                     </div>
